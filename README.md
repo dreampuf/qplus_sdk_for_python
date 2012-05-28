@@ -6,7 +6,7 @@
 
 ## 调用方法
 
-1. 声明api封装
+### 声明api封装
 
     appkey = "XXXXXX" #YOUR app key
     secret = "YYYYYY" #YOUR secret
@@ -14,12 +14,12 @@
     openkey = "XXXXXX" #Open key
     qa = QPlusAPI(appkey=appkey, secret=secret)
 
-2. 调用相应接口方法
+### 调用相应接口方法
 
     ret = qa.check_login({"app_openid": oppenid, "app_openkey": openkey})
     assertEqual(ret["valide"], 1)
 
-3. 调用Push方法
+### 调用Push方法
 
     pdata = {
         "QPLUSID": "185832728394E96479E36A199C2C8CBA", #QPlusID Q+的桌面应用ID

@@ -52,13 +52,13 @@ class QPlusAPI(object):
         #pdata = "&".join([k+"="+urllib.quote(str(v)) for k, v in sorted(pdict.iteritems(), key=lambda item: item[0])])
         pdata = urllib.urlencode(sorted(pdict.iteritems(), key=operator.itemgetter(0)))
         sig = self.get_sig(url + "&" + pdata)
-        pdata = pdata + "&" + sig + "=" +  sig
+        pdata = pdata + "&sig=" +  sig
         request = urllib2.Request(QPlusAPI.SERVER_OPEN%url, pdata)
         with contextlib.closing(urllib2.urlopen(request)) as f:
             return f.read()
 
     def check_sig(self, data):
-        """ 检测Sig是否有效 """
+        """ 检测Sig是否有效,请将Qplus首次转入的视图GET参数传入 """
         sig_chk = data.pop("sig", None)
         assert sig_chk is not None, "check_sig data must have sig"
         pdata = urllib.urlencode(sorted(data.iteritems(), key=operator.itemgetter(0)))
@@ -80,7 +80,6 @@ class QPlusAPI(object):
             app_openid: XXXXXX,
             app_openkey: XXXXXXXXX,
             app_userip: XXX.XXX.XXX.XXX,
-
         }
         """
 
@@ -118,15 +117,23 @@ import unittest
 
 class QPlusTestCase(unittest.TestCase):
     def setUp(self):
-        self.appkey = "XXXXXX" #YOUR app key
-        self.secret = "YYYYYY" #YOUR secret
-        self.oppenid = "XXXXXX" #Open Id
-        self.openkey = "XXXXXX" #Open key
+        self.appkey = "" #YOUR app key
+        self.secret = "" #YOUR secret
+        self.openid = "" #Open Id
+        self.openkey = "" #Open key
         self.qa = QPlusAPI(appkey=self.appkey, secret=self.secret)
 
     def test_check_login(self):
-        ret = self.qa.check_login({"app_openid": self.oppenid, "app_openkey": self.openkey})
+        ret = self.qa.check_login({"app_openid": self.openid, "app_openkey": self.openkey})
         self.assertEqual(ret["valide"], 1)
+
+    def test_userinfo(self):
+        ret = self.qa.get_userinfo({
+            "app_openid": self.openid,
+            "app_openkey": self.openkey,
+            "app_userip": "127.0.0.1",
+        })
+        self.assertTrue(ret["info"] is not None, "Userinfo mustn't be None")
 
     def test_send_push(self):
         pdata = {
